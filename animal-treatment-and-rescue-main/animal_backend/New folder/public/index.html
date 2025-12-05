@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Treatment and Rescue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700&display=swap');
+        
+        body {
+            background-image: url('image.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: #f6f8f6; /* Ensuring text color contrasts against background */
+            font-family: 'Raleway', sans-serif;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly darkened background for readability */
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            margin: 20px;
+            width: 100%;
+        }
+        #logo {
+            max-height: 100px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                text-align: left;
+            }
+            #logo {
+                margin-bottom: 0;
+                margin-right: 20px;
+            }
+        }
+        section {
+            display: none;
+        }
+        section.active {
+            display: block;
+        }
+        #map {
+            height: 400px; /* Adjusted map size */
+            margin-top: 20px;
+        }
+        #preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            display: none;
+            margin-top: 10px;
+        }
+        .mission-statement {
+            /*background-color: rgba(225, 10, 10, 0.6); /* Darkened background for readability */
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 1.2rem;
+        }
+        .mission-statement h2 {
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .mission-statement p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .mission-statement .mission-points {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .mission-statement .mission-points p {
+            margin: 0;
+        }
+        @media (min-width: 768px) {
+            .mission-statement .mission-points {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="text-white text-center py-5">
+        <img id="logo" src="logo.png" alt="Pawsitive Rescuers Logo"> <!-- Add your logo's file name here -->
+        <div>
+            <h1>Animal Treatment and Rescue</h1>
+            <p class="lead">"Saving one animal won't change the world, but it will change the world for that one animal."</p>
+        </div>
+    </header>
+
+
+    <!-- Add your interactive content and sections below -->
+
+
+    <!-- Navigation -->
+    <nav class="container text-center my-4">
+        <button class="btn btn-primary m-2" onclick="showSection('home')">Home</button>
+        <button class="btn btn-success m-2" onclick="showSection('rescue')">Request Rescue</button>
+        <button class="btn btn-warning m-2" onclick="showSection('consult')">Consult a Vet</button>
+        <button class="btn btn-info m-2" onclick="showSection('adopt')">Adopt an Animal</button>
+        <button class="btn btn-danger m-2" onclick="showSection('donation')">Donate</button>
+        <button class="btn btn-secondary m-2" onclick="showSection('complain')">File a Complaint</button>
+    </nav>
+
+    <!-- Sections -->
+    <section id="home" class="active">
+        <div class=" text- text-center py-5">
+            <h2><b>Welcome to Animal Treatment and Rescue</b></h2>
+            <p class="lead">Explore our services to help animals in need and make a difference!</p>
+        </div>
+       <!-- Mission Statement -->
+    <div class="mission-statement text-white text-center">
+        <h2>Our Mission</h2>
+        <p>At Pawsitive Rescuers, we are passionately committed to transforming the lives of street animals. Our mission is threefold:</p>
+        <div class="mission-points">
+            <p><strong>Rescue:</strong> We tirelessly work to save animals from the streets, providing them with a safe haven and a second chance at life.</p>
+            <p><strong>Treatment:</strong> Our dedicated team ensures that every rescued animal receives the medical care and rehabilitation they need to heal and thrive.</p>
+            <p><strong>Adoption:</strong> We strive to find loving forever homes for each animal, where they can experience the joy and companionship they deserve.</p>
+        </div>
+        <p>Together, as the Pawsitive Rescuers team, we believe in a world where every animal is cherished and cared for. Join us in making a pawsitive impact on the lives of these incredible creatures. 🐾❤️</p>
+    </div>
+    </section>
+
+    <section id="rescue">
+        <div class="container py-5">
+            <h2 class="text-center">Request Animal Rescue</h2>
+            <p class="text-center">Fill out the form below to request animal rescue assistance.</p>
+            <form id="rescue-form" action="/rescue" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location of Animal (Click on the Map to Select):</label>
+                    <input type="text" class="form-control" id="location" name="location" placeholder="Selected location will appear here" readonly required>
+                    <div id="map"></div>
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" id="description" name ="description" placeholder="Describe the animal and its condition" rows="4" required></textarea>
+                </div> 
+                 <div class="mb-3">
+                    <label for="animal-image" class="form-label">Upload Animal Picture:</label>
+                    <input type="file" class="form-control" id="animal-image" name="animal-image" accept="image/*" required>
+                    <img id="preview-image" alt="Image Preview">
+                </div>
+                <div class="mb-3">
+                    <label for="animal-video" class="form-label">Upload Animal Video (Optional):</label>
+                    <input type="file" class="form-control" id="animal-video" name="animal-video" accept="video/*">
+                </div> 
+                <button type="submit" class="btn btn-primary mt-3">Submit Rescue Request</button>
+            </form>          
+        </div> 
+    </section>
+
+    <section id="consult">
+        <div class="container py-5">
+            <h2 class="text-center">Consult a Vet</h2>
+            <p class="text-center">Get advice and support for animals from our experienced vets.</p>
+            <div class="d-flex justify-content-center">
+                <a href="https://wa.me/1234567890" target="_blank" class="btn btn-success m-2">WhatsApp</a>
+                <a href="https://t.me/yourTelegramLink" target="_blank" class="btn btn-info m-2">Telegram</a>
+                <a href="tel:+1234567890" class="btn btn-primary m-2">Call Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- <section id="adopt"> 
+        <div class="container py-5">
+            <h2 class="text-center">Adopt an Animal</h2>
+            <p class="text-center">Give a rescued animal a forever home. All adoptions are free of cost!</p>
+             <button class="btn btn-info m-2" onclick="redirectToAdoption()">Adopt an Animal</button> 
+            <div id="adoption-list">
+                 Animal adoption cards will be dynamically populated
+            </div>
+        </div>
+     </section>  -->
+
+    <section id="donation">
+        <div class="container py-5">
+            <h2 class="text-center">Make a Donation</h2>
+            <p class="text-center">Your contributions help us save more animals.</p>
+            <div class="text-center">
+                <a href="paytm://upi" class="btn btn-info">Donate via Paytm</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="complain">
+        <div class="container py-5">
+            <h2 class="text-center">File a Complaint</h2>
+            <p class="text-center">Report cases of animal cruelty or abuse.</p>
+            <form>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" class="form-control" id="email" placeholder="Your Email" required>
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" placeholder="Describe the issue" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">Submit Complaint</button>
+            </form>
+        </div>
+    </section>
+
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
+    <script src="/chatbot.js"></script>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(section => section.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpdmFtMjkwNyIsImEiOiJjbTR5OTl5amEwcWhyMmxzZG1kc2hoYTlyIn0.BjSp0fPYPeJQ4urEkk1tYA';
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                center: [77.7322496, 12.9463153], // default center location (India)
+                zoom: 10
+            });
+
+            let marker = new mapboxgl.Marker({
+                draggable: true
+            }).setLngLat([77.7322496, 12.9463153]).addTo(map);
+
+            marker.on("dragend", function () {
+                const lngLat = marker.getLngLat();
+                document.getElementById("location").value = `${lngLat.lat.toFixed(6)}, ${lngLat.lng.toFixed(6)}`;
+            });
+
+            map.on("click", function (e) {
+                const lat = e.lngLat.lat.toFixed(6);
+                const lng = e.lngLat.lng.toFixed(6);
+                marker.setLngLat([lng, lat]);
+                document.getElementById("location").value = `${lat}, ${lng}`;
+            });
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        map.setCenter([lng, lat]);
+                        marker.setLngLat([lng, lat]);
+                        document.getElementById("location").value = `${lat}, ${lng}`;
+                    },
+                    function () {
+                        alert("Unable to fetch current location. Please select manually.");
+                    }
+                );
+            }
+        });
+
+        document.getElementById("animal-image").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById("preview-image");
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById("rescue-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries()); // Convert form data to an object
+            try {
+                const response = await fetch("/rescue", {
+                    method: "POST",
+                    // headers: {
+                    //     "Content-Type": "application/json",
+                    // },
+                   // body: JSON.stringify(data), // Send data as JSON
+                   body: formData //send form data directly
+                });
+                //alert('test');
+                console.log(response);
+                if (response.ok) {
+                    const result = await response.json(); // Assuming the backend returns the ID of the new request
+                    //window.location.href = `view.html`; // Redirect to view request with ID
+                    alert("Rescue request submitted successfully!");
+                    event.target.reset(); // Clear the form after submission
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Error: ${errorMessage}`);
+                }
+            } catch (error) {
+                console.error("Request failed:", error);
+                alert("An error occurred while submitting the request. Please try again.");
+            }
+        });
+        document.getElementById("complain-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const description = document.getElementById("description").value;
+
+            const data = { name, email, description };
+
+            try {
+                const response = await fetch("/complain", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert("Complaint submitted successfully!");
+                } else {
+                    alert("Error submitting complaint.");
+                }
+            } catch (error) {
+                alert("Error submitting complaint.");
+            }
+        });
+        document.getElementById("donation-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const amount = document.getElementById("donation-amount").value;
+
+            const data = { amount };
+
+            try {
+                const response = await fetch("/donate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert("Donation received successfully!");
+                } else {
+                    alert("Error processing donation.");
+                }
+            } catch (error) {
+                alert("Error processing donation.");
+            }
+        });
+        document.getElementById("consult-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const contactMethod = document.getElementById("contact-method").value;
+
+            const data = { name, email, contactMethod };
+
+            try {
+                const response = await fetch("/consult", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert("Consultation request submitted successfully!");
+                } else {
+                    alert("Error submitting consultation request.");
+                }
+            } catch (error) {
+                alert("Error submitting consultation request.");
+            }
+        });
+
+        
+   </script>
+
+ <section id="adopt">
+    <div class="container py-5">
+        <h2 class="text-center text-white">Adopt an Animal</h2>
+        <p class="text-center text-white">Give a rescued animal a forever home. All adoptions are free of cost!</p>
+        <div id="adoption-container" class="d-flex justify-content-around flex-wrap">
+            <!-- Animal adoption cards will be dynamically populated -->
+        </div>
+    </div>
+</section>
+
+<style>
+    #adopt {
+        background-image: url('image.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #010602;
+    }
+
+    .adoption-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        width: 23%;
+        margin: 10px;
+    }
+
+    .adoption-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .adoption-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .adoption-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .adoption-card .card-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        text-align: center;
+        transition: opacity 0.3s ease;
+        opacity: 0;
+    }
+
+    .adoption-card:hover .card-content {
+        opacity: 1;
+    }
+
+    .adoption-card .card-content h5 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .adoption-card .card-content p {
+        margin: 5px 0;
+        font-size: 0.9rem;
+    }
+
+    .adoption-card .adopt-btn {
+        margin-top: 10px;
+        padding: 5px 15px;
+        font-size: 0.8rem;
+        border: none;
+        background: #f4c242;
+        color: #000;
+        border-radius: 5px;
+        text-transform: uppercase;
+        transition: background 0.3s ease, color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .adoption-card .adopt-btn:hover {
+        background: #fff;
+        color: #f4c242;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sample adoption animal data
+        const animals = [
+            { name: "Bella", type: "Dog", age: "2 years", img: "dog.jpeg" },
+            { name: "Charlie", type: "Cat", age: "1 year", img: "cat.png" },
+            { name: "Max", type: "Rabbit", age: "6 months", img: "rabbit.png" },
+            { name: "Lucy", type: "Parrot", age: "3 years", img: "parrot.png" }
+        ];
+
+        // Get the adoption list container
+        const adoptionContainer = document.getElementById("adoption-container");
+
+        // Generate adoption cards
+        animals.forEach(animal => {
+            const card = document.createElement("div");
+            card.className = "adoption-card";
+            card.innerHTML = `
+                <img src="${animal.img}" alt="${animal.name}">
+                <div class="card-content">
+                    <h5>${animal.name}</h5>
+                    <p>${animal.type} - ${animal.age}</p>
+                    <button class="adopt-btn" onclick="redirectToAdoption()">Adopt Now</button>
+                </div>
+            `;
+            adoptionContainer.appendChild(card);
+        });
+    });
+
+    function redirectToAdoption() {
+        window.location.href = "https://petofy.com/bangalore/pet-ngos";
+    }
+</script>
+
+    <!-- Chatbot Widget -->
+<div id="chatbot-container">
+    <div id="chatbot-header">
+        <span>Ask the Chatbot</span>
+        <button id="chatbot-close-btn">×</button>
+    </div>
+    <div id="chatbot-body">
+        <div id="chatbot-messages"></div>
+        <div id="chatbot-input-container">
+            <input type="text" id="chatbot-input" placeholder="Ask me anything about animals..." />
+            <button id="chatbot-send-btn">Send</button>
+        </div>
+    </div>
+</div>
+<style>
+    /* Chatbot Widget CSS */
+    #chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        max-height: 500px;
+        background: rgb(63, 33, 33);
+        border: 1px solid #ccc;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        display: none; /* Hidden by default */
+        flex-direction: column;
+    }
+
+    #chatbot-header {
+        background: #007bff;
+        color: white;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        cursor: pointer;
+    }
+
+    #chatbot-body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    #chatbot-messages {
+        padding: 10px;
+        flex-grow: 1;
+        overflow-y: auto;
+        font-family: Arial, sans-serif;
+    }
+
+    #chatbot-messages div {
+        margin-bottom: 10px;
+    }
+
+    #chatbot-input-container {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+    }
+
+    #chatbot-input {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    #chatbot-send-btn {
+        margin-left: 10px;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+</style>
+
+<button id="chatbot-toggle" style="position: fixed; bottom: 20px; right: 20px; background: #007bff; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer;">💬</button>
+
+
+<!-- Footer -->
+<footer class="text-center">
+    <p>© 2024 Animal Treatment and Rescue | All rights reserved.</p>
+</footer>
+    
+</body>
+</html>

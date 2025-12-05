@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Rescue Requests</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Admin Portal - Rescue Requests</h1>
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                    <th>Video</th>
+                </tr>
+            </thead>
+            <tbody id="rescue-requests-table">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchRescueRequests() {
+            try {
+                const response = await fetch('/rescue-requests');
+                const requests = await response.json();
+                
+                const tableBody = document.getElementById('rescue-requests-table');
+                tableBody.innerHTML = '';
+                
+                requests.forEach(request => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${request.id}</td>
+                        <td>${request.name}</td>
+                        <td>${request.email}</td>
+                        <td>${request.location}</td>
+                        <td>${request.description}</td>
+                        <td><img src="data:image/jpeg;base64,${request.image}" alt="Animal Image" width="100"></td>
+                        <td>
+                            ${request.video_url 
+                            ? `<a href="${request.video_url}" target="_blank">View Video</a>` 
+                            : "No Video"}
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Failed to fetch rescue requests:', error);
+            }
+        }
+
+        window.onload = fetchRescueRequests;
+    </script>
+</body>
+</html>
